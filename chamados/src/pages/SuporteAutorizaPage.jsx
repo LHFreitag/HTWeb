@@ -148,7 +148,7 @@ export default function SuporteAutorizaPage() {
     return (
       <div className="suporte-autoriza-page">
         <div className="page-header">
-          <button className="btn-back" onClick={() => navigate('/')}>
+          <button className="btn-back" onClick={() => navigate('/cliente')}>
             ← Voltar
           </button>
           <h1>Autenticação Administrativo</h1>

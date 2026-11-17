@@ -55,7 +55,7 @@ export default function TreinamentosPage() {
   return (
     <div className="treinamentos-page">
       <div className="page-header">
-        <button className="btn-back" onClick={() => navigate('/')}>
+        <button className="btn-back" onClick={() => navigate('/cliente')}>
           ← Voltar
         </button>
         <h1>Biblioteca de Treinamentos</h1>

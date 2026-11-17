@@ -184,7 +184,7 @@ export default function SuporteNovoPage() {
   return (
     <div className="suporte-novo-page">
       <div className="page-header">
-        <button className="btn-back" onClick={() => navigate('/')}>
+        <button className="btn-back" onClick={() => navigate('/cliente')}>
           ← Voltar
         </button>
         <h1>Cadastro de Novo Membro de Suporte</h1>
