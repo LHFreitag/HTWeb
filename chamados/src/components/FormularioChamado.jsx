@@ -54,7 +54,7 @@ export default function FormularioChamado({ onChamadoCriado }) {
       }
 
       setTimeout(() => {
-        navigate('/');
+        navigate('/cliente');
       }, 2000);
     } catch (error) {
       console.error('Erro ao criar chamado:', error);
