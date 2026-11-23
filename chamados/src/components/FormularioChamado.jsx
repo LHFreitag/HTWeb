@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import './FormularioChamado.css';
@@ -164,6 +164,11 @@ export default function FormularioChamado({ onChamadoCriado }) {
               {mensagem}
             </div>
           )}
+
+          <p className="aviso-privacidade">
+            Usamos seu e-mail e telefone só para atender este chamado. Não coloque senhas nem dados de cartão
+            na descrição. Veja a <Link to="/privacidade">Política de Privacidade</Link>.
+          </p>
 
           <button
             type="submit"

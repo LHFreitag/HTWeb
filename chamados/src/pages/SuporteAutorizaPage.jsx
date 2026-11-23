@@ -18,16 +18,11 @@ const STATUS_CLASS = {
 };
 
 export default function SuporteAutorizaPage() {
-  // Validar token apenas quando o componente é renderizado
-  if (!import.meta.env.VITE_ADMIN_TOKEN) {
-    throw new Error('❌ VITE_ADMIN_TOKEN não foi definido! Configure em .env.local');
-  }
 
-  const TOKEN_ADMIN_CORRETO = import.meta.env.VITE_ADMIN_TOKEN;
   const navigate = useNavigate();
-  const { obterTokenAdmin, setarTokenAdmin } = useAuth();
-  const [tokenIngresado, setTokenIngresado] = useState('');
-  const [tokenAutenticado, setTokenAutenticado] = useState(false);
+  const { sairAdmin } = useAuth();
+  // Acesso validado antes pelo AdminRoute (login Firebase + documento em admins/{uid}).
+  const tokenAutenticado = true;
   const [solicitacoes, setSolicitacoes] = useState([]);
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState({ tipo: '', texto: '' });
@@ -39,11 +34,8 @@ export default function SuporteAutorizaPage() {
   const [atualizandoId, setAtualizandoId] = useState(null);
 
   useEffect(() => {
-    // Verificar se já tem token válido
-    if (obterTokenAdmin() === TOKEN_ADMIN_CORRETO) {
-      setTokenAutenticado(true);
-      carregarSolicitacoes();
-    }
+    carregarSolicitacoes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Escutar equipe em tempo real quando o painel estiver aberto
@@ -89,24 +81,6 @@ export default function SuporteAutorizaPage() {
     }
   };
 
-  const handleTokenSubmit = (e) => {
-    e.preventDefault();
-    
-    if (tokenIngresado === TOKEN_ADMIN_CORRETO) {
-      setTokenAutenticado(true);
-      setarTokenAdmin(TOKEN_ADMIN_CORRETO);
-      setMensagem({
-        tipo: 'sucesso',
-        texto: '✅ Autenticado com sucesso!',
-      });
-      carregarSolicitacoes();
-    } else {
-      setMensagem({
-        tipo: 'erro',
-        texto: '❌ Token inválido',
-      });
-    }
-  };
 
   const aprovarSuporte = async (id, email) => {
     try {
@@ -144,54 +118,6 @@ export default function SuporteAutorizaPage() {
     }
   };
 
-  if (!tokenAutenticado) {
-    return (
-      <div className="suporte-autoriza-page">
-        <div className="page-header">
-          <button className="btn-back" onClick={() => navigate('/cliente')}>
-            ← Voltar
-          </button>
-          <h1>Autenticação Administrativo</h1>
-          <div></div>
-        </div>
-
-        <div className="auth-container">
-          <div className="auth-form-wrapper">
-            <h2>Acesso Restrito</h2>
-            <p>Apenas administradores podem acessar esta página. Digite o token de administrador.</p>
-
-            <form onSubmit={handleTokenSubmit} className="auth-form">
-              <div className="form-group">
-                <label>Token de Administrador</label>
-                <input
-                  type="password"
-                  placeholder="Digite o token"
-                  value={tokenIngresado}
-                  onChange={(e) => setTokenIngresado(e.target.value)}
-                  required
-                />
-              </div>
-
-              {mensagem.texto && (
-                <div className={`mensagem mensagem-${mensagem.tipo}`}>
-                  {mensagem.texto}
-                </div>
-              )}
-
-              <button type="submit" className="btn-submit">
-                Autenticar
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <footer>
-          <span>© 2026 AutoMax Sistemas — Todos os direitos reservados</span>
-          <span>v 23.2.6</span>
-        </footer>
-      </div>
-    );
-  }
 
   return (
     <div className="suporte-autoriza-page">
@@ -222,11 +148,7 @@ export default function SuporteAutorizaPage() {
           >
             👥 Equipe
           </button>
-          <button className="btn-logout" onClick={() => {
-            setTokenAutenticado(false);
-            setTokenIngresado('');
-            setSolicitacoes([]);
-          }}>
+          <button className="btn-logout" onClick={sairAdmin}>
             Sair
           </button>
         </div>
@@ -264,7 +186,6 @@ export default function SuporteAutorizaPage() {
                 <div className="card-info">
                   <p><strong>Email:</strong> {suporte.email}</p>
                   {suporte.telefone && <p><strong>Telefone:</strong> {suporte.telefone}</p>}
-                  <p><strong>CPF:</strong> {suporte.cpf}</p>
                   <p><strong>Experiência:</strong> {suporte.experiencia}</p>
                 </div>
 

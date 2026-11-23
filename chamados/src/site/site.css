@@ -323,7 +323,7 @@
 
 /* Rodapé */
 .ht-site .footer { border-top: 1px solid var(--line); background: var(--bg-deep); }
-.ht-site .footer .wrap { padding-block: 48px calc(48px + 64px); display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 32px; }
+.ht-site .footer .wrap { padding-block: 48px 32px; display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 32px; }
 .ht-site .footer h4 { font-family: var(--font-body); font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color: var(--subtle); margin-bottom: 12px; }
 .ht-site .footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
 .ht-site .footer a { text-decoration: none; color: var(--muted); font-size: 15px; display: inline-flex; align-items: center; min-height: 44px; background: linear-gradient(currentColor, currentColor) 0 calc(100% - 10px) / 0 1px no-repeat; transition: background-size .2s var(--ease); }
@@ -429,3 +429,39 @@
 .ht-site .mo-lt__type { font-size: clamp(52px, 9vw, 150px); line-height: 1; letter-spacing: -0.035em; margin: 0; color: var(--fg); max-width: 14ch; }
 @media (max-width: 639px) { .ht-site .mo-lt__type { font-size: clamp(44px, 14vw, 84px); } }
 .ht-site [id] { scroll-margin-top: 76px; }
+
+/* ── Páginas legais (Privacidade, Termos) ── */
+.ht-site .legal .wrap { max-width: 880px; padding-block: 56px 96px; display: grid; gap: 40px; }
+.ht-site .legal-head { display: grid; gap: 14px; }
+.ht-site .legal-head h1 { font-size: clamp(32px, 4.4vw, 48px); font-weight: 800; }
+.ht-site .legal section { display: grid; gap: 14px; scroll-margin-top: 88px; }
+.ht-site .legal h2 { font-size: 22px; font-weight: 700; margin-top: 8px; }
+.ht-site .legal p, .ht-site .legal li { color: var(--muted); }
+.ht-site .legal strong { color: var(--fg); }
+.ht-site .legal a:not(.btn) { color: var(--gold-ink); }
+.ht-site .legal ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.ht-site .legal-cols { columns: 2 280px; column-gap: 32px; display: block !important; }
+.ht-site .legal-cols li { margin-bottom: 6px; break-inside: avoid; }
+.ht-site .legal-toc { display: flex; flex-wrap: wrap; gap: 8px; }
+.ht-site .legal-toc a { font-size: 14px; font-weight: 700; text-decoration: none; padding: 8px 12px; min-height: 44px; display: inline-flex; align-items: center; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--muted) !important; }
+.ht-site .legal-toc a:hover { border-color: var(--gold); color: var(--fg) !important; }
+.ht-site .legal-table-wrap { overflow-x: auto; border: 1px solid var(--line-strong); border-radius: 12px; }
+.ht-site .legal-table { width: 100%; min-width: 720px; border-collapse: collapse; font-size: 14px; }
+.ht-site .legal-table th, .ht-site .legal-table td { text-align: left; vertical-align: top; padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--muted); }
+.ht-site .legal-table thead th { color: var(--fg); background: var(--surface); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.ht-site .legal-table tbody th { color: var(--fg); font-weight: 700; }
+.ht-site .legal-table tr:last-child > * { border-bottom: 0; }
+.ht-site .legal-cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.a-preencher { background: #ffe066; color: #3a2a00; padding: 0 4px; border-radius: 4px; font-weight: 700; }
+
+/* ── Rodapé: faixa legal ── */
+.ht-site .footer .wrap.footer-legal { display: flex; flex-wrap: wrap; gap: 4px 20px; align-items: center; padding-block: 16px calc(16px + 64px); border-top: 1px solid var(--line); font-size: 13px; color: var(--subtle); }
+.ht-site .footer .footer-legal a, .ht-site .footer .footer-legal button { font-size: 13px; color: var(--muted); min-height: 44px; }
+.ht-site .footer .footer-legal button { background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.ht-site .footer .footer-legal button:hover { color: var(--gold-ink); }
+.ht-site .footer .footer-legal .sep { flex: 1; }
+
+/* ── Formulário: aviso de privacidade e consentimento ── */
+.ht-site .privacy a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+.ht-site .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); cursor: pointer; text-align: left; }
+.ht-site .consent input { margin-top: 3px; width: 18px; height: 18px; flex: none; accent-color: var(--gold); }

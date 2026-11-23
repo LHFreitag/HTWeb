@@ -4,7 +4,10 @@ import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import './SuporteLoginForm.css';
 
-export default function SuporteLoginForm({ onLoginSuccess }) {
+/* modo 'suporte' (padrão): login da equipe para o Kanban, exige cadastro aprovado em suportes.
+   modo 'admin': login do painel administrativo; quem decide o acesso é o AdminRoute (admins/{uid}). */
+export default function SuporteLoginForm({ onLoginSuccess, modo = 'suporte' }) {
+  const ehAdmin = modo === 'admin';
   const { login, loginComGoogle, autenticar } = useAuth();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -19,6 +22,7 @@ export default function SuporteLoginForm({ onLoginSuccess }) {
     try {
       // Fazer login no Firebase Auth
       await login(email, senha);
+      if (ehAdmin) return; // o AdminRoute confere a permissão de administrador
 
       // Verificar se está autorizado no Firestore
       const q = query(
@@ -60,6 +64,8 @@ export default function SuporteLoginForm({ onLoginSuccess }) {
         mensagemErro = 'Senha incorreta';
       } else if (erro.code === 'auth/invalid-email') {
         mensagemErro = 'Email inválido';
+      } else if (erro.code === 'auth/invalid-credential') {
+        mensagemErro = 'Email ou senha incorretos';
       }
 
       setMensagem({
@@ -77,6 +83,7 @@ export default function SuporteLoginForm({ onLoginSuccess }) {
 
     try {
       const user = await loginComGoogle();
+      if (ehAdmin) return; // o AdminRoute confere a permissão de administrador
 
       // Verificar se está autorizado no Firestore
       const q = query(
@@ -127,8 +134,8 @@ export default function SuporteLoginForm({ onLoginSuccess }) {
   return (
     <div className="suporte-login-form">
       <div className="login-card">
-        <h2>Acesso de Suporte</h2>
-        <p>Faça login com suas credenciais para acessar o Kanban</p>
+        <h2>{ehAdmin ? 'Painel Administrativo' : 'Acesso de Suporte'}</h2>
+        <p>{ehAdmin ? 'Entre com sua conta de administrador' : 'Faça login com suas credenciais para acessar o Kanban'}</p>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -185,10 +192,10 @@ export default function SuporteLoginForm({ onLoginSuccess }) {
           Entrar com Google
         </button>
 
-        <div className="login-footer">
+        {!ehAdmin && <div className="login-footer">
           <p>Não possui conta?</p>
           <a href="/suporte/novo">Cadastre-se aqui</a>
-        </div>
+        </div>}
       </div>
     </div>
   );

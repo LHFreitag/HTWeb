@@ -1,0 +1,109 @@
+rules_version = '2';
+
+// Regras do Firestore — House Tech (LGPD, art. 46: medidas de segurança).
+// Princípio: negar tudo por padrão e liberar só o necessário para cada tela.
+//
+// Papéis:
+//   admin   = usuário logado com documento em admins/{uid} (criado à mão no console do Firebase)
+//   equipe  = admin OU membro de suporte com suportes/{uid}.status == 'aprovado'
+//   público = qualquer visitante (sem login)
+//
+// Publicar: firebase deploy --only firestore:rules  (só depois de confirmar o projeto Firebase certo)
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() { return request.auth != null; }
+    function ehAdmin() {
+      return logado() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function ehEquipe() {
+      return ehAdmin() || (logado()
+        && exists(/databases/$(database)/documents/suportes/$(request.auth.uid))
+        && get(/databases/$(database)/documents/suportes/$(request.auth.uid)).data.status == 'aprovado');
+    }
+    function texto(v, max) { return v is string && v.size() <= max; }
+    function textoOpcional(m, campo, max) { return !(campo in m) || texto(m[campo], max); }
+
+    // ── Administradores ── só leitura do próprio documento; criação/remoção apenas pelo console.
+    match /admins/{uid} {
+      allow read: if logado() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // ── Membros da equipe de suporte ── (nome, e-mail, telefone, experiência)
+    match /suportes/{id} {
+      // A própria pessoa (id = uid; ou cadastro antigo com o mesmo e-mail) e o admin.
+      allow read: if ehAdmin()
+        || (logado() && id == request.auth.uid)
+        || (logado() && resource.data.email == request.auth.token.email);
+      // Pedido de cadastro: só para si mesmo, sempre entra como "aguardando_aprovacao", sem CPF.
+      allow create: if logado()
+        && id == request.auth.uid
+        && request.resource.data.keys().hasOnly(['nome', 'email', 'telefone', 'experiencia', 'status', 'dataCadastro'])
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.status == 'aguardando_aprovacao'
+        && texto(request.resource.data.nome, 120)
+        && textoOpcional(request.resource.data, 'telefone', 30)
+        && request.resource.data.dataCadastro == request.time;
+      allow update, delete: if ehAdmin();
+    }
+
+    // ── Chamados de suporte ── (e-mail, telefone, descrição do problema)
+    match /chamados/{id} {
+      // Abertura pública pelo formulário /novo, com campos e tamanhos limitados.
+      allow create: if request.resource.data.keys().hasOnly(
+            ['titulo', 'descricao', 'email', 'telefone', 'categoria', 'prioridade', 'status', 'dataCriacao', 'dataAtualizacao'])
+        && texto(request.resource.data.titulo, 200)
+        && texto(request.resource.data.descricao, 5000)
+        && texto(request.resource.data.email, 254)
+        && textoOpcional(request.resource.data, 'telefone', 30)
+        && request.resource.data.status == 'pendente'
+        && request.resource.data.dataCriacao == request.time;
+      // Leitura e gestão: só a equipe. Visitantes não veem chamados de outras pessoas.
+      allow read, update: if ehEquipe();
+      allow delete: if ehAdmin();
+    }
+
+    // ── Conteúdo público ──
+    match /novidades/{id} {
+      allow read: if true;
+      allow write: if ehAdmin();
+    }
+    match /treinamentos/{id} {
+      allow read: if true;
+      allow write: if ehAdmin();
+    }
+
+    // ── Pedidos de demonstração (leads) ── para quando o formulário passar a gravar no Firestore.
+    match /leads/{id} {
+      allow create: if request.resource.data.keys().hasOnly(
+            ['produto', 'nome', 'whatsapp', 'cidade', 'email', 'unidades', 'sistemaAtual', 'resumo',
+             'baseLegal', 'consentimentos', 'origem', 'criadoEm'])
+        && texto(request.resource.data.nome, 120)
+        && texto(request.resource.data.whatsapp, 30)
+        && textoOpcional(request.resource.data, 'cidade', 80)
+        && textoOpcional(request.resource.data, 'email', 254)
+        && textoOpcional(request.resource.data, 'resumo', 2000)
+        && request.resource.data.criadoEm == request.time;
+      allow read, update, delete: if ehAdmin();
+    }
+
+    // ── Registro de consentimentos (ledger) ── só cresce: ninguém edita nem apaga eventos.
+    // Revogar = criar um evento novo com tipo 'REVOKED'.
+    match /consentimentos/{id} {
+      allow create: if request.resource.data.tipo in ['GRANTED', 'REVOKED']
+        && texto(request.resource.data.finalidade, 60)
+        && texto(request.resource.data.versaoPolitica, 20)
+        && texto(request.resource.data.textoApresentado, 500)
+        && request.resource.data.registradoEm == request.time;
+      allow read: if ehAdmin();
+      allow update, delete: if false;
+    }
+
+    // Qualquer outra coleção: bloqueada.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
