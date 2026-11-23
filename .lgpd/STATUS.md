@@ -12,8 +12,9 @@
 > Esta análise cobre o que está no repositório. Não é parecer jurídico: revisar com advogado(a) de proteção de dados antes de publicar.
 
 ## Escopo verificado vs. fora do repositório
+- **Confirmado pela empresa**: projeto Firebase `automax-55b5e` pertence à conta do proprietário (2026-11-23).
 - **Verificado no código**: rotas React, formulários (demonstração, chamado, cadastro de suporte, login), uso do Firestore/Storage/Auth, scripts de terceiros (Google Fonts, analytics), regras do Firestore/Storage, armazenamento local do navegador.
-- **Requer validação externa**: titularidade do projeto Firebase `automax-55b5e`; região do Firestore; aceite dos termos de processamento de dados do Google Cloud/Firebase; dados reais já gravados em produção (CPFs antigos em `suportes`); processos humanos do comercial no WhatsApp.
+- **Requer validação externa**: região do Firestore; aceite dos termos de processamento de dados do Google Cloud/Firebase; dados reais já gravados em produção (CPFs antigos em `suportes`); processos humanos do comercial no WhatsApp.
 
 ## Pipeline (B até L5, depois A F5–F15)
 - [x] L0 — Setup e enquadramento (ATPP: ME confirmada no CNPJ)
@@ -42,4 +43,4 @@
 - Fontes servidas pelo próprio site (sem Google Fonts).
 
 ## Próximo passo
-Dados do controlador preenchidos a partir do CNPJ. Falta: confirmar projeto Firebase, revisar `ROPA.md` e a política. Depois: publicar regras e site.
+Dados do controlador preenchidos a partir do CNPJ. Projeto Firebase confirmado. Falta: revisar `ROPA.md` e a política. Depois: publicar regras e site.

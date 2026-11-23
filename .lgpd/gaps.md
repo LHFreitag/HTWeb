@@ -3,7 +3,7 @@
 ## Da empresa (não dá para resolver no código)
 1. ~~Dados do controlador~~ preenchidos a partir do CNPJ (2026-11-23). O endereço do CNPJ é residencial: se o cadastro for atualizado para o escritório novo, trocar em `empresa.js`.
 2. ~~Porte~~ confirmado: Microempresa → dispensa de encarregado (Res. 2/2022, art. 11), mantendo o canal.
-3. **Confirmar o projeto Firebase** e só então publicar regras (`firebase deploy --only firestore:rules,storage`) e site.
+3. ~~Projeto Firebase~~ confirmado (2026-11-23): `automax-55b5e` está na conta do proprietário da empresa. Falta só a decisão de publicar regras (`firebase deploy --only firestore:rules,storage`) e site.
 4. **Cadastrar o primeiro admin** (documento em `admins/{uid}`) e **migrar cadastros de suporte antigos**, apagando os CPFs já gravados (ver `FIRESTORE_RULES.md`).
 5. **Avaliar o incidente** registrado em `incidents/log.md` (token e regras abertas no site antigo).
 6. Revisão jurídica da política e dos termos.

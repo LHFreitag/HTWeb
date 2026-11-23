@@ -4,8 +4,9 @@ As regras ficam versionadas em `firestore.rules` e `storage.rules` (referenciada
 Elas são a principal proteção dos dados pessoais do site (LGPD, art. 46): mesmo que alguém abra o
 JavaScript do site, o banco só entrega o que cada papel pode ver.
 
-> ⚠️ Não publique enquanto não estiver confirmado qual projeto Firebase é o da House Tech
-> (o `.firebaserc` aponta para `automax-55b5e`).
+> O projeto Firebase `automax-55b5e` (no `.firebaserc`) é da empresa, na conta do proprietário (confirmado em 2026-11-23).
+> Antes de publicar as regras, cadastre o primeiro admin e migre os cadastros de suporte antigos (abaixo),
+> senão a equipe atual perde o acesso ao Kanban.
 
 ## Quem pode o quê
 
@@ -48,7 +49,7 @@ fazendo login, mas **não conseguem ler chamados** até serem migrados:
 npm run test:rules   # sobe o emulador local (precisa de Java 21) e roda tests/firestore-rules.test.mjs
 ```
 
-## Publicar (quando o projeto estiver confirmado)
+## Publicar
 
 ```bash
 firebase deploy --only firestore:rules,storage
