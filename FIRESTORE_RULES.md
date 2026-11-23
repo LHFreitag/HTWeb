@@ -34,14 +34,32 @@ pessoa podia lê-lo. Agora o painel (`/suporte`, `/suporte/autoriza`, `/suporte/
 
 ## Migração dos cadastros de suporte antigos
 
-Cadastros novos de suporte usam o **UID do login como ID do documento** em `suportes`. As regras
-usam isso para saber quem é equipe. Cadastros antigos (criados com ID aleatório) continuam
-fazendo login, mas **não conseguem ler chamados** até serem migrados:
+Cadastros novos de suporte usam o **UID do login como ID do documento** em `suportes`, e as regras
+usam isso para saber quem é equipe. Os cadastros antigos (ID aleatório) precisam ser copiados para
+`suportes/{uid}` **antes de publicar as regras**, senão a equipe entra mas vê o Kanban vazio.
 
-1. Em **Authentication**, copie o UID da pessoa.
-2. Em **Firestore → suportes**, crie um documento com ID = UID e copie os campos do antigo
-   (`nome`, `email`, `telefone`, `experiencia`, `status`, `dataCadastro`). **Não copie o `cpf`.**
-3. Apague o documento antigo (isso também elimina o CPF que era coletado antes).
+O script `scripts/migrar-suportes.mjs` faz isso:
+
+1. No console do Firebase → ⚙️ **Configurações do projeto** → **Contas de serviço** → **Gerar nova chave privada**.
+   Salve o arquivo `.json` fora da pasta do projeto (ele dá acesso total ao banco; nunca envie nem commite).
+2. Na raiz do projeto, aponte para a chave e rode a **simulação** (não grava nada, só mostra o que faria
+   e salva um backup em `backup-lgpd/`):
+   ```bash
+   # Windows (PowerShell)
+   $env:GOOGLE_APPLICATION_CREDENTIALS="C:\caminho\da\chave.json"
+   npm run migrar:suportes
+   ```
+3. Se o resultado estiver certo, aplique. Escolha uma das opções:
+   ```bash
+   npm run migrar:suportes -- --executar                    # copia sem CPF e mantém os antigos (com CPF)
+   npm run migrar:suportes -- --executar --apagar-antigos   # copia sem CPF e apaga os antigos (o CPF deixa de existir)
+   ```
+   `--manter-cpf` copia o CPF para o documento novo (não recomendado).
+4. Cadastros cujo e-mail não tem conta de login são listados no fim e ficam como estão.
+5. Quando não precisar mais, apague a pasta `backup-lgpd/` (tem dados pessoais) e revogue a chave
+   em **Contas de serviço** (ou apague o arquivo).
+
+Chamados, novidades, treinamentos e contas de login não são alterados pelo script.
 
 ## Testar as regras
 
