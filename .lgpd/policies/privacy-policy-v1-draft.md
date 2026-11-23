@@ -5,7 +5,7 @@
 ## Conferência com o ROPA e com o art. 9º
 - [x] Finalidade e base legal de cada tratamento (tabela da seção 2)
 - [x] Forma e duração / retenção (tabela da seção 2)
-- [ ] Identificação do controlador — **razão social, CNPJ e endereço a preencher**
+- [x] Identificação do controlador (razão social, CNPJ e endereço do cadastro na Receita)
 - [x] Canal do titular (Rota B ATPP) / encarregado se nomeado
 - [x] Compartilhamento com papéis (operador, controlador independente/conjunto)
 - [x] Direitos do art. 18, canais gratuitos e prazos

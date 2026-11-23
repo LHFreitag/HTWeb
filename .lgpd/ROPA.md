@@ -1,6 +1,6 @@
 # Registro das Operações de Tratamento (art. 37) — rascunho para revisão
 
-Controlador: [a preencher: razão social / CNPJ] — House Tech Sistemas
+Controlador: L. V. Freitag Sistemas e Consultoria (House Tech Sistemas), CNPJ 30.846.822/0001-59 — Av. das Palmeiras, 144, Casa 127, Qd. F, Lt. 87, Jardim Imperial, Cuiabá - MT, CEP 78075-900
 Canal do titular: housetechcba@gmail.com · WhatsApp (65) 9934-0033
 
 | Operação | Finalidade | Base legal | Titulares | Categorias de dados | Compartilhamento | Transferência internacional | Retenção | Segurança |

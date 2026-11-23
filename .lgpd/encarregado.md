@@ -1,6 +1,6 @@
 # Governança de Encarregado / Canal de Privacidade
 
-**Regime adotado**: Rota B — ATPP de baixo risco, dispensa de encarregado (Res. CD/ANPD nº 2/2022, art. 11) ⚠ confirmar porte
+**Regime adotado**: Rota B — ATPP de baixo risco, dispensa de encarregado (Res. CD/ANPD nº 2/2022, art. 11). Porte: Microempresa (CNPJ 30.846.822/0001-59, consulta de 2026-11-23)
 **Data de formalização**: ⚠ a preencher pela empresa
 
 ## Canal público de comunicação (obrigatório)
