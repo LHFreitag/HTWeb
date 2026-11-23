@@ -13,5 +13,5 @@
 ## Técnicas (próximos PRs)
 9. Backend do formulário de demonstração (`enviarLead`): gravar em `leads` + `consentimentos` e avisar o comercial.
 10. Rotina de exclusão de leads com mais de 12 meses.
-11. Remover o CPF dos documentos antigos de `suportes` (script de migração).
+11. Migração de `suportes`: decisão da empresa (2026-11-23) = copiar para `suportes/{uid}` sem CPF e **manter os documentos antigos** (que ainda têm CPF). Os antigos só são legíveis pelo admin nas regras novas. Reavaliar a exclusão do CPF (art. 6º, III; art. 16) e definir prazo.
 12. `robots.txt` com `noindex` para `/cliente`, `/suporte`, `/kanban` (thread de SEO).
