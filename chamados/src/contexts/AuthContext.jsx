@@ -7,7 +7,7 @@ import {
   onAuthStateChanged 
 } from 'firebase/auth';
 import { auth, googleProvider, db } from '../firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -19,41 +19,51 @@ export function AuthProvider({ children }) {
   const [carregando, setCarregando] = useState(true);
   const [usuarioAutorizado, setUsuarioAutorizado] = useState(false);
 
+  const [usuarioAdmin, setUsuarioAdmin] = useState(false);
+
   useEffect(() => {
+    // Limpa dados pessoais que versões antigas guardavam no navegador (minimização, LGPD art. 6º, III).
+    ['automax_usuario_email', 'automax_usuario_nome', 'automax_usuario_tipo', 'automax_usuario_autorizado', 'automax_admin_token']
+      .forEach((k) => { try { localStorage.removeItem(k); } catch { /* sem armazenamento */ } });
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUsuarioEmail(firebaseUser.email);
 
+        // Admin: a pessoa precisa ter um documento em admins/{uid}, criado à mão no console do Firebase.
+        // O papel vale também no servidor: as regras do Firestore conferem o mesmo documento.
         try {
-          // Verificar no Firestore se é membro de suporte e qual o status
-          const q = query(
-            collection(db, 'suportes'),
-            where('email', '==', firebaseUser.email)
-          );
-          const snap = await getDocs(q);
+          const adminSnap = await getDoc(doc(db, 'admins', firebaseUser.uid));
+          setUsuarioAdmin(adminSnap.exists());
+        } catch {
+          setUsuarioAdmin(false);
+        }
 
-          if (!snap.empty) {
-            const suporteData = snap.docs[0].data();
-            const autorizado = suporteData.status === 'aprovado';
+        try {
+          // Membro de suporte: documento suportes/{uid} (cadastros novos) ou, nos cadastros antigos,
+          // o documento com o mesmo e-mail do login.
+          let suporteData = null;
+          const porUid = await getDoc(doc(db, 'suportes', firebaseUser.uid));
+          if (porUid.exists()) {
+            suporteData = porUid.data();
+          } else {
+            const snap = await getDocs(query(collection(db, 'suportes'), where('email', '==', firebaseUser.email)));
+            if (!snap.empty) suporteData = snap.docs[0].data();
+          }
+
+          if (suporteData) {
             setUsuarioTipo('suporte');
-            setUsuarioAutorizado(autorizado);
+            setUsuarioAutorizado(suporteData.status === 'aprovado');
             setUsuarioNome(suporteData.nome || '');
-            localStorage.setItem('automax_usuario_tipo', 'suporte');
-            localStorage.setItem('automax_usuario_autorizado', autorizado ? 'true' : 'false');
-            localStorage.setItem('automax_usuario_nome', suporteData.nome || '');
           } else {
             setUsuarioTipo('cliente');
             setUsuarioAutorizado(false);
             setUsuarioNome('');
-            localStorage.setItem('automax_usuario_tipo', 'cliente');
-            localStorage.setItem('automax_usuario_autorizado', 'false');
           }
-        } catch (err) {
-          // Fallback para localStorage se Firestore falhar
-          const tipoSalvo = localStorage.getItem('automax_usuario_tipo');
-          const autorizadoSalvo = localStorage.getItem('automax_usuario_autorizado');
-          setUsuarioTipo(tipoSalvo || 'cliente');
-          setUsuarioAutorizado(autorizadoSalvo === 'true');
+        } catch {
+          // Sem acesso ao cadastro: trata como cliente. Nunca confia em valor guardado no navegador.
+          setUsuarioTipo('cliente');
+          setUsuarioAutorizado(false);
         }
 
         setUsuarioAutenticado(true);
@@ -62,12 +72,8 @@ export function AuthProvider({ children }) {
         setUsuarioNome('');
         setUsuarioTipo('cliente');
         setUsuarioAutorizado(false);
+        setUsuarioAdmin(false);
         setUsuarioAutenticado(false);
-        localStorage.removeItem('automax_usuario_email');
-        localStorage.removeItem('automax_usuario_nome');
-        localStorage.removeItem('automax_usuario_tipo');
-        localStorage.removeItem('automax_usuario_autorizado');
-        localStorage.removeItem('automax_admin_token');
       }
       setCarregando(false);
     });
@@ -102,14 +108,13 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Chamado pelo formulário de login do suporte depois de validar o cadastro aprovado.
+  // Só atualiza o estado em memória; nada de dados pessoais no localStorage.
   const autenticar = (email, tipo = 'cliente', autorizado = false) => {
     setUsuarioEmail(email);
     setUsuarioTipo(tipo);
     setUsuarioAutenticado(true);
     setUsuarioAutorizado(autorizado);
-    localStorage.setItem('automax_usuario_email', email);
-    localStorage.setItem('automax_usuario_tipo', tipo);
-    localStorage.setItem('automax_usuario_autorizado', autorizado ? 'true' : 'false');
   };
 
   const desautenticar = async () => {
@@ -120,29 +125,17 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const setarAutorizacao = (autorizado) => {
-    setUsuarioAutorizado(autorizado);
-    localStorage.setItem('automax_usuario_autorizado', autorizado ? 'true' : 'false');
+  // Sair do painel administrativo = encerrar a sessão do Firebase Auth.
+  const sairAdmin = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Erro ao sair:', error);
+    }
   };
 
-  const setarTokenAdmin = (token) => {
-    localStorage.setItem('automax_admin_token', token);
-  };
-
-  const obterTokenAdmin = () => {
-    return localStorage.getItem('automax_admin_token');
-  };
-
-  const sairAdmin = () => {
-    localStorage.removeItem('automax_admin_token');
-  };
-
-  // Admin já autenticado no Painel Administrativo (token) não deve reautenticar como suporte
-  const isAdminAutenticado = () => {
-    const tokenCorreto = import.meta.env.VITE_ADMIN_TOKEN;
-    const tokenSalvo = obterTokenAdmin();
-    return Boolean(tokenCorreto) && tokenSalvo === tokenCorreto;
-  };
+  // Mantido com o mesmo nome para as telas que já usavam: agora reflete o papel real (admins/{uid}).
+  const isAdminAutenticado = () => usuarioAdmin;
 
   const registrarComGoogle = async () => {
     try {
@@ -170,6 +163,7 @@ export function AuthProvider({ children }) {
         usuarioNome,
         usuarioTipo,
         usuarioAutorizado,
+        usuarioAdmin,
         carregando,
         registrar,
         login,
@@ -178,9 +172,6 @@ export function AuthProvider({ children }) {
         loginComGoogle,
         autenticar,
         desautenticar,
-        setarAutorizacao,
-        setarTokenAdmin,
-        obterTokenAdmin,
         sairAdmin,
         isAdminAutenticado,
       }}

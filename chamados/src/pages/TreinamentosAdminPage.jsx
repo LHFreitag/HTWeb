@@ -11,16 +11,12 @@ import './TreinamentosAdminPage.css';
 const FORM_INICIAL = { secao: '', titulo: '', descricao: '', urlVideo: '' };
 
 export default function TreinamentosAdminPage() {
-  if (!import.meta.env.VITE_ADMIN_TOKEN) {
-    throw new Error('❌ VITE_ADMIN_TOKEN não foi definido! Configure em .env.local');
-  }
 
-  const TOKEN_ADMIN_CORRETO = import.meta.env.VITE_ADMIN_TOKEN;
   const navigate = useNavigate();
-  const { obterTokenAdmin, setarTokenAdmin } = useAuth();
+  const { sairAdmin } = useAuth();
 
-  const [tokenIngresado, setTokenIngresado] = useState('');
-  const [tokenAutenticado, setTokenAutenticado] = useState(false);
+  // Acesso validado antes pelo AdminRoute (login Firebase + documento em admins/{uid}).
+  const tokenAutenticado = true;
   const [mensagem, setMensagem] = useState({ tipo: '', texto: '' });
 
   const [conteudos, setConteudos] = useState([]);
@@ -32,13 +28,6 @@ export default function TreinamentosAdminPage() {
   const [salvando, setSalvando] = useState(false);
 
   const [secaoFiltro, setSecaoFiltro] = useState('');
-
-  // Verificar token salvo
-  useEffect(() => {
-    if (obterTokenAdmin() === TOKEN_ADMIN_CORRETO) {
-      setTokenAutenticado(true);
-    }
-  }, []);
 
   // Escutar conteúdos em tempo real após autenticação
   useEffect(() => {
@@ -64,16 +53,6 @@ export default function TreinamentosAdminPage() {
     return () => unsubscribe();
   }, [tokenAutenticado]);
 
-  const handleTokenSubmit = (e) => {
-    e.preventDefault();
-    if (tokenIngresado === TOKEN_ADMIN_CORRETO) {
-      setTokenAutenticado(true);
-      setarTokenAdmin(TOKEN_ADMIN_CORRETO);
-      setMensagem({ tipo: 'sucesso', texto: '✅ Autenticado com sucesso!' });
-    } else {
-      setMensagem({ tipo: 'erro', texto: '❌ Token inválido' });
-    }
-  };
 
   const secoes = [...new Set(conteudos.map((c) => c.secao))].sort();
   const conteudosFiltrados = secaoFiltro
@@ -157,48 +136,6 @@ export default function TreinamentosAdminPage() {
     }
   };
 
-  // ── Tela de autenticação ──
-  if (!tokenAutenticado) {
-    return (
-      <div className="treinamentos-admin-page">
-        <div className="page-header">
-          <button className="btn-back" onClick={() => navigate('/suporte')}>
-            ← Voltar
-          </button>
-          <h1>Gestão de Treinamentos</h1>
-          <div></div>
-        </div>
-
-        <div className="auth-container">
-          <div className="auth-form-wrapper">
-            <h2>Acesso Restrito</h2>
-            <p>Digite o token de administrador para gerenciar os conteúdos de treinamento.</p>
-            <form onSubmit={handleTokenSubmit} className="auth-form">
-              <div className="form-group">
-                <label>Token de Administrador</label>
-                <input
-                  type="password"
-                  placeholder="Digite o token"
-                  value={tokenIngresado}
-                  onChange={(e) => setTokenIngresado(e.target.value)}
-                  required
-                />
-              </div>
-              {mensagem.texto && (
-                <div className={`mensagem mensagem-${mensagem.tipo}`}>{mensagem.texto}</div>
-              )}
-              <button type="submit" className="btn-submit">Autenticar</button>
-            </form>
-          </div>
-        </div>
-
-        <footer>
-          <span>© 2026 AutoMax Sistemas — Todos os direitos reservados</span>
-          <span>v 23.2.6</span>
-        </footer>
-      </div>
-    );
-  }
 
   // ── Painel admin ──
   return (
@@ -212,10 +149,7 @@ export default function TreinamentosAdminPage() {
           <button className="btn-visualizar" onClick={() => navigate('/treinamentos')}>
             👁 Visualizar
           </button>
-          <button className="btn-logout" onClick={() => {
-            setTokenAutenticado(false);
-            setTokenIngresado('');
-          }}>
+          <button className="btn-logout" onClick={sairAdmin}>
             Sair
           </button>
         </div>

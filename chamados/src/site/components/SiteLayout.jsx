@@ -3,6 +3,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CONTATO, waLink } from '../contato';
 import { IconZap, Logo } from './Icons';
 import { Lightbox, SiteContext, rolarAte, useLightbox } from './Shared';
+import { EMPRESA } from '../../privacidade/empresa';
+import { abrirPreferencias } from '../../privacidade/consent';
+import Preencher from '../../privacidade/Preencher';
 import '../site.css';
 
 /* Casca comum do site de apresentação.
@@ -105,8 +108,19 @@ export default function SiteLayout({ landing, children }) {
               <ul>
                 <li>{linkAncora('como', 'Como funciona')}</li>
                 <li><a href={`#${demoId}`} onClick={irParaDemo}>Fale com um consultor</a></li>
+                <li><Link to="/privacidade#direitos">Seus dados (LGPD)</Link></li>
               </ul>
             </div>
+          </div>
+          <div className="wrap footer-legal">
+            <span>
+              © {new Date().getFullYear()} <Preencher valor={EMPRESA.razaoSocial} rotulo="razão social" /> · CNPJ{' '}
+              <Preencher valor={EMPRESA.cnpj} rotulo="CNPJ" /> · {EMPRESA.cidade}
+            </span>
+            <span className="sep" />
+            <Link to="/privacidade">Política de Privacidade</Link>
+            <Link to="/termos">Termos de Uso</Link>
+            <button type="button" onClick={abrirPreferencias}>Preferências de cookies</button>
           </div>
         </footer>
 

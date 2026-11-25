@@ -6,16 +6,12 @@ import { useAuth } from '../contexts/AuthContext';
 import './SuporteDashboardPage.css';
 
 export default function SuporteDashboardPage() {
-  if (!import.meta.env.VITE_ADMIN_TOKEN) {
-    throw new Error('❌ VITE_ADMIN_TOKEN não foi definido! Configure em .env.local');
-  }
 
-  const TOKEN_ADMIN_CORRETO = import.meta.env.VITE_ADMIN_TOKEN;
   const navigate = useNavigate();
-  const { obterTokenAdmin, setarTokenAdmin } = useAuth();
+  const { sairAdmin } = useAuth();
 
-  const [tokenIngresado, setTokenIngresado] = useState('');
-  const [tokenAutenticado, setTokenAutenticado] = useState(false);
+  // Acesso validado antes pelo AdminRoute (login Firebase + documento em admins/{uid}).
+  const tokenAutenticado = true;
   const [mensagem, setMensagem] = useState({ tipo: '', texto: '' });
 
   const [stats, setStats] = useState({
@@ -24,10 +20,6 @@ export default function SuporteDashboardPage() {
     treinamentos: null,
     chamados: null,
   });
-
-  useEffect(() => {
-    if (obterTokenAdmin() === TOKEN_ADMIN_CORRETO) setTokenAutenticado(true);
-  }, []);
 
   useEffect(() => {
     if (!tokenAutenticado) return;
@@ -50,20 +42,10 @@ export default function SuporteDashboardPage() {
       .catch(() => {});
   }, [tokenAutenticado]);
 
-  const handleTokenSubmit = (e) => {
-    e.preventDefault();
-    if (tokenIngresado === TOKEN_ADMIN_CORRETO) {
-      setTokenAutenticado(true);
-      setarTokenAdmin(TOKEN_ADMIN_CORRETO);
-    } else {
-      setMensagem({ tipo: 'erro', texto: '❌ Token inválido' });
-    }
-  };
 
   const handleSair = () => {
-    setTokenAutenticado(false);
-    setTokenIngresado('');
     setMensagem({ tipo: '', texto: '' });
+    sairAdmin();
   };
 
   const modulos = [
@@ -111,48 +93,6 @@ export default function SuporteDashboardPage() {
     },
   ];
 
-  // ── Tela de autenticação ──
-  if (!tokenAutenticado) {
-    return (
-      <div className="suporte-dashboard-page">
-        <div className="page-header">
-          <div></div>
-          <h1>Painel Administrativo</h1>
-          <div></div>
-        </div>
-
-        <div className="auth-container">
-          <div className="auth-form-wrapper">
-            <div className="auth-icon">🔐</div>
-            <h2>Acesso Restrito</h2>
-            <p>Digite o token de administrador para acessar o painel.</p>
-            <form onSubmit={handleTokenSubmit} className="auth-form">
-              <div className="form-group">
-                <label>Token de Administrador</label>
-                <input
-                  type="password"
-                  placeholder="Digite o token"
-                  value={tokenIngresado}
-                  onChange={(e) => setTokenIngresado(e.target.value)}
-                  autoFocus
-                  required
-                />
-              </div>
-              {mensagem.texto && (
-                <div className={`mensagem mensagem-${mensagem.tipo}`}>{mensagem.texto}</div>
-              )}
-              <button type="submit" className="btn-submit">Entrar</button>
-            </form>
-          </div>
-        </div>
-
-        <footer>
-          <span>© 2026 AutoMax Sistemas — Todos os direitos reservados</span>
-          <span>v 23.2.6</span>
-        </footer>
-      </div>
-    );
-  }
 
   // ── Dashboard ──
   return (

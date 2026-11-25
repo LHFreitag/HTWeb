@@ -31,7 +31,7 @@ Sua aplicação React foi **completamente reestruturada** para suportar:
 
 ### ✅ Painel Admin
 - [x] Rota `/suporte/autoriza` com token
-- [x] Token: `automax-admin-2026-secret` (mude em produção!)
+- [x] Token: `(removido: agora é login Firebase + admins/{uid}, ver FIRESTORE_RULES.md)` (mude em produção!)
 - [x] Aprovar/Rejeitar solicitações de suporte
 - [x] Rota: **`http://localhost:3000/suporte/autoriza`** (🔐 Token)
 
@@ -150,7 +150,7 @@ Agora pode acessar /kanban ✅
 ```
 /suporte/autoriza (Admin)
    ↓
-Digita token: automax-admin-2026-secret
+Digita token: (removido: agora é login Firebase + admins/{uid}, ver FIRESTORE_RULES.md)
    ↓
 Autenticado como "admin"
    ↓

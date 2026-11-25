@@ -1,0 +1,24 @@
+rules_version = '2';
+
+// Regras do Firebase Storage — House Tech.
+// Imagens das novidades são públicas (aparecem na área do cliente); só o admin envia ou apaga.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function ehAdmin() {
+      return request.auth != null
+        && firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+
+    match /novidades/{arquivo} {
+      allow read: if true;
+      allow write: if ehAdmin()
+        && (request.resource == null
+            || (request.resource.size < 10 * 1024 * 1024
+                && request.resource.contentType.matches('image/.*|video/.*|application/pdf')));
+    }
+
+    match /{todoOResto=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -110,16 +110,12 @@ function statusPublicacao(item) {
 }
 
 export default function NovidadesAdminPage() {
-  if (!import.meta.env.VITE_ADMIN_TOKEN) {
-    throw new Error('❌ VITE_ADMIN_TOKEN não foi definido! Configure em .env.local');
-  }
 
-  const TOKEN_ADMIN_CORRETO = import.meta.env.VITE_ADMIN_TOKEN;
   const navigate = useNavigate();
-  const { obterTokenAdmin, setarTokenAdmin } = useAuth();
+  const { sairAdmin } = useAuth();
 
-  const [tokenIngresado, setTokenIngresado] = useState('');
-  const [tokenAutenticado, setTokenAutenticado] = useState(false);
+  // Acesso validado antes pelo AdminRoute (login Firebase + documento em admins/{uid}).
+  const tokenAutenticado = true;
   const [mensagem, setMensagem] = useState({ tipo: '', texto: '' });
 
   const [novidades, setNovidades] = useState([]);
@@ -129,10 +125,6 @@ export default function NovidadesAdminPage() {
   const [editandoId, setEditandoId] = useState(null);
   const [form, setForm] = useState(FORM_INICIAL);
   const [salvando, setSalvando] = useState(false);
-
-  useEffect(() => {
-    if (obterTokenAdmin() === TOKEN_ADMIN_CORRETO) setTokenAutenticado(true);
-  }, []);
 
   useEffect(() => {
     if (!tokenAutenticado) return;
@@ -149,16 +141,6 @@ export default function NovidadesAdminPage() {
     return () => unsubscribe();
   }, [tokenAutenticado]);
 
-  const handleTokenSubmit = (e) => {
-    e.preventDefault();
-    if (tokenIngresado === TOKEN_ADMIN_CORRETO) {
-      setTokenAutenticado(true);
-      setarTokenAdmin(TOKEN_ADMIN_CORRETO);
-      setMensagem({ tipo: 'sucesso', texto: '✅ Autenticado com sucesso!' });
-    } else {
-      setMensagem({ tipo: 'erro', texto: '❌ Token inválido' });
-    }
-  };
 
   const abrirNovoForm = () => {
     setEditandoId(null);
@@ -233,39 +215,6 @@ export default function NovidadesAdminPage() {
     }
   };
 
-  // ── Tela de autenticação ──
-  if (!tokenAutenticado) {
-    return (
-      <div className="novidades-admin-page">
-        <div className="page-header">
-          <button className="btn-back" onClick={() => navigate('/suporte')}>← Voltar</button>
-          <h1>Gestão de Novidades</h1>
-          <div></div>
-        </div>
-        <div className="auth-container">
-          <div className="auth-form-wrapper">
-            <h2>Acesso Restrito</h2>
-            <p>Digite o token de administrador para gerenciar as novidades exibidas na home.</p>
-            <form onSubmit={handleTokenSubmit} className="auth-form">
-              <div className="form-group">
-                <label>Token de Administrador</label>
-                <input type="password" placeholder="Digite o token" value={tokenIngresado}
-                  onChange={(e) => setTokenIngresado(e.target.value)} required />
-              </div>
-              {mensagem.texto && (
-                <div className={`mensagem mensagem-${mensagem.tipo}`}>{mensagem.texto}</div>
-              )}
-              <button type="submit" className="btn-submit">Autenticar</button>
-            </form>
-          </div>
-        </div>
-        <footer>
-          <span>© 2026 AutoMax Sistemas — Todos os direitos reservados</span>
-          <span>v 23.2.6</span>
-        </footer>
-      </div>
-    );
-  }
 
   // ── Painel admin ──
   return (
@@ -274,7 +223,7 @@ export default function NovidadesAdminPage() {
         <button className="btn-back" onClick={() => navigate('/suporte')}>← Voltar</button>
         <h1>Gestão de Novidades</h1>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn-logout" onClick={() => { setTokenAutenticado(false); setTokenIngresado(''); }}>
+          <button className="btn-logout" onClick={sairAdmin}>
             Sair
           </button>
         </div>

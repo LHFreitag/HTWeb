@@ -122,9 +122,8 @@ http://localhost:3000/
 
 **O que é:** Painel administrativo para aprovar/rejeitar novos suportes
 
-**Proteção:** ⚠️ **REQUER TOKEN ADMIN**
-- Token: `automax-admin-2026-secret` (hardcoded - mude em produção!)
-- Salvo em `localStorage` como `automax_admin_token`
+**Proteção:** login Firebase Auth + documento em `admins/{uid}` (ver FIRESTORE_RULES.md)
+- Token: `(removido: agora é login Firebase + admins/{uid}, ver FIRESTORE_RULES.md)` (hardcoded - mude em produção!)
 
 **Funcionalidade:**
 1. Tela de autenticação com campo de token
@@ -279,7 +278,7 @@ http://localhost:3000/suporte/novo
 ```
 http://localhost:3000/suporte/autoriza
 ```
-- Token: `automax-admin-2026-secret`
+- Token: `(removido: agora é login Firebase + admins/{uid}, ver FIRESTORE_RULES.md)`
 - Deve mostrar lista de solicitações
 - Pode aprovar/rejeitar
 
@@ -288,7 +287,7 @@ http://localhost:3000/suporte/autoriza
 ## ⚠️ Importante para Produção
 
 1. **Token Admin:**
-   - Está hardcoded como `automax-admin-2026-secret`
+   - Está hardcoded como `(removido: agora é login Firebase + admins/{uid}, ver FIRESTORE_RULES.md)`
    - Em produção, use variável de ambiente
    - Mude para algo mais seguro
 

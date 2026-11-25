@@ -75,3 +75,8 @@ build/
 
 # dataconnect generated files
 .dataconnect
+
+# Backups locais da migração LGPD (contêm dados pessoais) e chaves de conta de serviço
+backup-lgpd/
+*serviceAccount*.json
+*-firebase-adminsdk-*.json

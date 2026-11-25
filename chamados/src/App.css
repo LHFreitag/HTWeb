@@ -37,3 +37,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(240, 180, 41, 0.3);
 }
+
+/* Aviso de privacidade nos formulários da área do cliente e do suporte (LGPD, art. 9º) */
+.aviso-privacidade { font-size: 13px; line-height: 1.5; opacity: 0.8; margin: 4px 0 12px; }
+.aviso-privacidade a { color: inherit; text-decoration: underline; }

@@ -1,7 +1,10 @@
 import { useId, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { PRODUTOS } from '../data';
 import { enviarLead, waURL } from '../contato';
 import { IconZap } from './Icons';
+import { TEXTO_CONSENTIMENTO_MARKETING, eventoConsentimento } from '../../privacidade/consentimentoMarketing';
+import { registrarEvento } from '../../privacidade/consent';
 
 /* Formulário de demonstração em 2 passos.
    fixo: 'automax' | 'mettre' nas landings (sem a pergunta do negócio); no hub, escolha + onPick. */
@@ -14,6 +17,7 @@ export default function DemoForm({ fixo, escolha, onPick }) {
   const [zap, setZap] = useState('');
   const [cidade, setCidade] = useState('');
   const [email, setEmail] = useState('');
+  const [aceitaNovidades, setAceitaNovidades] = useState(false); // sempre começa desmarcada (LGPD, art. 8º)
   const [erro, setErro] = useState(null);
   const [ok, setOk] = useState(null);
   const nomeRef = useRef(null);
@@ -51,14 +55,23 @@ export default function DemoForm({ fixo, escolha, onPick }) {
     ].filter(Boolean).join('\n');
 
     // TODO(backend): ver enviarLead em contato.js (e-mail + WhatsApp automáticos só para o comercial).
-    enviarLead({ produto: produto.nome, nome: nome.trim(), whatsapp: zap, cidade: cidade.trim(), email: email.trim(), unidades, sistemaAtual, resumo }).catch(() => {});
+    // Minimização: só vai o que o comercial precisa para marcar a demonstração.
+    // O consentimento de marketing segue junto como evento separado, apenas se a caixa foi marcada.
+    enviarLead({
+      produto: produto.nome, nome: nome.trim(), whatsapp: zap, cidade: cidade.trim(), email: email.trim(), unidades, sistemaAtual, resumo,
+      baseLegal: 'art. 7º, V (procedimentos preliminares a contrato, a pedido do titular)',
+      consentimentos: aceitaNovidades
+        ? [eventoConsentimento({ canal: 'formulario_demonstracao', pagina: window.location.pathname })]
+        : [],
+    }).catch(() => {});
+    registrarEvento('pedido_demonstracao', { produto: produto.nome });
 
     setOk({ primeiroNome: nome.trim().split(' ')[0], zap, produto: produto.nome, href: waURL(resumo) });
     setPasso(3);
   };
 
   const reiniciar = () => {
-    setNome(''); setZap(''); setCidade(''); setEmail(''); setUnidades('1');
+    setNome(''); setZap(''); setCidade(''); setEmail(''); setAceitaNovidades(false); setUnidades('1');
     setSistemaAtual('Outro sistema e quero trocar'); setOk(null); setPasso(1);
   };
 
@@ -127,12 +140,19 @@ export default function DemoForm({ fixo, escolha, onPick }) {
             <label htmlFor={`${id}-mail`}>E-mail <span className="note">(opcional)</span></label>
             <input className="input" id={`${id}-mail`} type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
+          <label className="consent" htmlFor={`${id}-mkt`}>
+            <input type="checkbox" id={`${id}-mkt`} checked={aceitaNovidades} onChange={(e) => setAceitaNovidades(e.target.checked)} />
+            <span>{TEXTO_CONSENTIMENTO_MARKETING} <span className="note">(opcional)</span></span>
+          </label>
           {erro && <span className="err-msg" role="alert">{erro.msg}</span>}
           <div className="form-foot">
             <button className="btn btn-ghost" type="button" onClick={() => setPasso(1)}>Voltar</button>
             <button className="btn btn-gold btn-lg" type="submit" style={{ flex: 1 }}>Quero minha demonstração</button>
           </div>
-          <p className="privacy">Seus dados ficam com a House Tech. Não enviamos spam.</p>
+          <p className="privacy">
+            Usamos seus dados só para falar com você sobre a demonstração e a proposta. Saiba como cuidamos deles na{' '}
+            <Link to="/privacidade">Política de Privacidade</Link>.
+          </p>
         </div>
       )}
 

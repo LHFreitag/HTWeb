@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { Link } from 'react-router-dom';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import './SuporteNovoPage.css';
@@ -14,7 +15,6 @@ export default function SuporteNovoPage() {
     senha: '',
     confirmarSenha: '',
     telefone: '',
-    cpf: '',
     experiencia: 'iniciante',
   });
   const [carregando, setCarregando] = useState(false);
@@ -50,21 +50,16 @@ export default function SuporteNovoPage() {
         throw new Error('As senhas não correspondem');
       }
 
-      // Validar CPF básico (apenas números, 11 dígitos)
-      const cpfLimpo = formData.cpf.replace(/\D/g, '');
-      if (cpfLimpo.length !== 11) {
-        throw new Error('CPF deve ter 11 dígitos');
-      }
 
       // Registrar no Firebase Auth
-      await registrar(formData.email, formData.senha);
+      const novoUsuario = await registrar(formData.email, formData.senha);
 
-      // Salvar no Firestore
-      await addDoc(collection(db, 'suportes'), {
+      // Salvar no Firestore. O id do documento é o uid do login: as regras do Firestore
+      // usam isso para só a própria pessoa (e o admin) lerem o cadastro.
+      await setDoc(doc(db, 'suportes', novoUsuario.uid), {
         nome: formData.nome,
         email: formData.email,
         telefone: formData.telefone,
-        cpf: cpfLimpo,
         experiencia: formData.experiencia,
         status: 'aguardando_aprovacao',
         dataCadastro: serverTimestamp(),
@@ -140,23 +135,16 @@ export default function SuporteNovoPage() {
     setMensagem({ tipo: '', texto: '' });
 
     try {
-      // Validar CPF
-      const cpfLimpo = formData.cpf.replace(/\D/g, '');
-      if (cpfLimpo.length !== 11) {
-        throw new Error('CPF deve ter 11 dígitos');
-      }
-
       // Validar nome
       if (!formData.nome.trim()) {
         throw new Error('Nome é obrigatório');
       }
 
-      // Salvar no Firestore
-      await addDoc(collection(db, 'suportes'), {
+      // Salvar no Firestore (id = uid do login, ver acima)
+      await setDoc(doc(db, 'suportes', googleUser.uid), {
         nome: formData.nome,
         email: formData.email,
         telefone: formData.telefone,
-        cpf: cpfLimpo,
         experiencia: formData.experiencia,
         status: 'aguardando_aprovacao',
         dataCadastro: serverTimestamp(),
@@ -294,18 +282,6 @@ export default function SuporteNovoPage() {
 
           <div className="form-row">
             <div className="form-group">
-              <label>CPF *</label>
-              <input
-                type="text"
-                name="cpf"
-                placeholder="000.000.000-00"
-                value={formData.cpf}
-                onChange={handleChange}
-                required
-                disabled={carregando}
-              />
-            </div>
-            <div className="form-group">
               <label>Nível de Experiência *</label>
               <select
                 name="experiencia"
@@ -326,6 +302,11 @@ export default function SuporteNovoPage() {
               {mensagem.texto}
             </div>
           )}
+
+          <p className="aviso-privacidade">
+            Usamos estes dados só para analisar seu pedido e controlar seu acesso ao painel de suporte.
+            Veja a <Link to="/privacidade">Política de Privacidade</Link>.
+          </p>
 
           <button
             type="submit"
