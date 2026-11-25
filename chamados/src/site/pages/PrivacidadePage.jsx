@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import SiteLayout from '../components/SiteLayout';
 import { waURL } from '../contato';
 import { EMPRESA, ENCARREGADO, PRAZO_LEADS_MESES, VERSAO_POLITICA } from '../../privacidade/empresa';
-import { abrirPreferencias, GA_ID, PIXEL_ID } from '../../privacidade/consent';
+import { abrirPreferencias, GA_ID, PIXEL_ID, RD_LOADER } from '../../privacidade/consent';
 import Preencher from '../../privacidade/Preencher';
 
 export const ASSUNTO_TITULAR = 'LGPD - Solicitação do titular de dados';
@@ -147,11 +147,12 @@ export default function PrivacidadePage() {
               <li><strong>Google (Firebase), como operador:</strong> hospedagem do site, banco de dados, login e armazenamento de arquivos, seguindo nossas instruções.</li>
               <li><strong>Meta (WhatsApp), como controlador independente:</strong> quando você fala com a gente pelo WhatsApp, a conversa passa pelos servidores da Meta, que segue a política de privacidade dela.</li>
               {GA_ID && <li><strong>Google Analytics, como operador:</strong> só se você aceitar os cookies de estatística.</li>}
+              {RD_LOADER && <li><strong>RD Station Marketing (Resultados Digitais), como operador:</strong> só se você aceitar os cookies de marketing. Registra as páginas visitadas e, se você já tiver falado com a gente, liga essas visitas ao seu contato para o comercial entender seu interesse.</li>}
               {PIXEL_ID && <li><strong>Meta (Pixel do Facebook/Instagram), com quem compartilhamos o controle desses dados:</strong> só se você aceitar os cookies de marketing.</li>}
               <li><strong>Autoridades públicas:</strong> quando houver obrigação legal ou ordem judicial.</li>
             </ul>
             <p>
-              <strong>Transferência internacional (art. 33).</strong> Google e Meta podem guardar e processar dados em servidores
+              <strong>Transferência internacional (art. 33).</strong> Google, Meta e o RD Station podem guardar e processar dados em servidores
               fora do Brasil, principalmente nos Estados Unidos, para as finalidades acima. Como os Estados Unidos não têm decisão
               de adequação da ANPD, essas transferências se apoiam nas cláusulas contratuais de proteção de dados oferecidas por
               esses fornecedores (art. 33, II) e, no caso do WhatsApp, no fato de a conversa ser necessária para atender o seu
@@ -228,7 +229,7 @@ export default function PrivacidadePage() {
                 <tbody>
                   <tr><th scope="row">Necessários</th><td>Lembrar sua escolha de cookies e o tipo de negócio escolhido; manter o login da área do cliente e do suporte.</td><td>House Tech e Google (Firebase Auth)</td><td>Até 12 meses</td></tr>
                   <tr><th scope="row">Estatística</th><td>Contar visitas, páginas vistas e cliques de forma agregada.</td><td>{GA_ID ? 'Google Analytics (_ga, _gid)' : 'Nenhuma ferramenta ativa no momento'}</td><td>Até 13 meses</td></tr>
-                  <tr><th scope="row">Marketing</th><td>Mostrar anúncios da House Tech a quem já visitou o site e medir os resultados.</td><td>{PIXEL_ID ? 'Meta Pixel (_fbp, _fbc)' : 'Nenhuma ferramenta ativa no momento'}</td><td>Até 3 meses</td></tr>
+                  <tr><th scope="row">Marketing</th><td>Registrar as páginas visitadas para o comercial (RD Station), mostrar anúncios da House Tech a quem já visitou o site e medir os resultados.</td><td>{[RD_LOADER && 'RD Station (__trf.src, rdtrk)', PIXEL_ID && 'Meta Pixel (_fbp, _fbc)'].filter(Boolean).join('; ') || 'Nenhuma ferramenta ativa no momento'}</td><td>Até 12 meses</td></tr>
                 </tbody>
               </table>
             </div>

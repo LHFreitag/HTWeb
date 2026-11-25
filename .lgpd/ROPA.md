@@ -12,6 +12,6 @@ Canal do titular: housetechcba@gmail.com · WhatsApp (65) 9934-0033
 | Equipe de suporte | controle de acesso | 7º, V e IX | colaboradores | identificação, contato, credenciais | Google | conferir região | enquanto na equipe | Auth + regras |
 | Registros de acesso | segurança / Marco Civil | 7º, II | visitantes | IP, data/hora, navegador | Google | EUA | 6 meses | provedor |
 | Cookies de estatística | medir visitas | 7º, I | visitantes que aceitaram | identificadores online | Google | EUA — 33, II | até 13 meses | só após aceite |
-| Cookies de marketing | remarketing | 7º, I | visitantes que aceitaram | identificadores online | Meta | EUA — 33, II | até 3 meses | só após aceite |
+| Cookies de marketing | remarketing e monitoramento de visitas para o comercial (RD Station) | 7º, I | visitantes que aceitaram | identificadores online, páginas visitadas | Meta, RD Station | EUA — 33, II | até 12 meses | só após aceite |
 
 ⏸ **CHECKPOINT**: a empresa deve revisar e confirmar este registro antes de publicar a política.

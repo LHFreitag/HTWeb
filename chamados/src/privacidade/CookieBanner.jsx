@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GA_ID, PIXEL_ID, TEM_OPCIONAIS, lerConsentimento, salvarConsentimento } from './consent';
+import { GA_ID, PIXEL_ID, RD_LOADER, TEM_OPCIONAIS, lerConsentimento, salvarConsentimento } from './consent';
 import './cookie-banner.css';
 
 /* Banner e painel de preferências de cookies. Montado uma vez no App, vale para todas as páginas.
@@ -40,8 +40,8 @@ export default function CookieBanner() {
       <h2 id="ht-cookies-titulo" tabIndex={-1} ref={tituloRef}>Sua privacidade</h2>
       <p>
         Usamos cookies necessários para o site funcionar. Com a sua permissão, usamos também cookies de
-        estatística, para saber quais páginas ajudam mais, e de marketing, para mostrar anúncios da House Tech
-        a quem já visitou o site. Você escolhe e pode mudar quando quiser.{' '}
+        estatística, para saber quais páginas ajudam mais, e de marketing, para nosso time comercial acompanhar
+        as visitas e mostrar anúncios da House Tech a quem já visitou o site. Você escolhe e pode mudar quando quiser.{' '}
         <Link to="/privacidade#cookies">Política de Privacidade</Link>.
       </p>
 
@@ -61,7 +61,8 @@ export default function CookieBanner() {
           <label className="ht-cookies-opcao">
             <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />
             <span>
-              <strong>Marketing.</strong> Permitem mostrar anúncios da House Tech no Instagram, Facebook e Google
+              <strong>Marketing.</strong> Permitem que nossa equipe comercial saiba quais páginas você visitou
+              {RD_LOADER ? ' (RD Station)' : ''} e mostrar anúncios da House Tech no Instagram, Facebook e Google
               {PIXEL_ID ? ' (Pixel da Meta)' : ''}.
             </span>
           </label>

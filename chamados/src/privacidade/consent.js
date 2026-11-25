@@ -3,7 +3,8 @@
    Categorias:
    - necessarios:  sempre ativos (lembrar esta escolha, login da área do cliente). Não pedem consentimento.
    - estatistica:  Google Analytics 4, se VITE_GA_ID estiver definido.
-   - marketing:    Pixel da Meta (Instagram/Facebook) e remarketing, se VITE_META_PIXEL_ID estiver definido.
+   - marketing:    Pixel da Meta (Instagram/Facebook) e remarketing, se VITE_META_PIXEL_ID estiver definido,
+                   e o código de monitoramento do RD Station Marketing (VITE_RD_STATION_LOADER; vazio desliga).
 
    Nada de estatística ou marketing é carregado antes de a pessoa aceitar. Recusar é tão fácil
    quanto aceitar (mesmo destaque no banner), e a escolha pode ser mudada a qualquer momento
@@ -15,9 +16,13 @@ const VALIDADE_MS = 365 * 24 * 60 * 60 * 1000;
 
 export const GA_ID = import.meta.env.VITE_GA_ID || '';
 export const PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID || '';
+// Código de monitoramento do RD Station Marketing da House Tech. O RD usa cookies para ligar as
+// visitas ao contato do lead, então só carrega com consentimento de marketing (LGPD art. 7º, I).
+const RD_PADRAO = 'https://d335luupugsy2.cloudfront.net/js/loader-scripts/49e4dd00-8cdb-4014-adc2-51f1a3d414e5-loader.js';
+export const RD_LOADER = import.meta.env.VITE_RD_STATION_LOADER ?? RD_PADRAO;
 
 /** Há alguma ferramenta opcional configurada? Sem nenhuma, o banner não precisa aparecer. */
-export const TEM_OPCIONAIS = Boolean(GA_ID || PIXEL_ID);
+export const TEM_OPCIONAIS = Boolean(GA_ID || PIXEL_ID || RD_LOADER);
 
 const ouvintes = new Set();
 
@@ -61,6 +66,7 @@ export function abrirPreferencias() {
 
 let gaCarregado = false;
 let pixelCarregado = false;
+let rdCarregado = false;
 
 function injetarScript(src) {
   const s = document.createElement('script');
@@ -99,6 +105,12 @@ function carregarPixel() {
   injetarScript('https://connect.facebook.net/en_US/fbevents.js');
 }
 
+function carregarRD() {
+  if (!RD_LOADER || rdCarregado) return;
+  rdCarregado = true;
+  injetarScript(RD_LOADER);
+}
+
 function apagarCookies(prefixos) {
   const dominio = window.location.hostname;
   const alvos = [dominio, `.${dominio}`, `.${dominio.split('.').slice(-2).join('.')}`];
@@ -113,7 +125,7 @@ function apagarCookies(prefixos) {
 function aplicarConsentimento(atual, anterior) {
   if (!atual) return;
   if (atual.estatistica) carregarGA();
-  if (atual.marketing) carregarPixel();
+  if (atual.marketing) { carregarPixel(); carregarRD(); }
 
   // Retirada do consentimento (LGPD, art. 8º, §5º): para de coletar e apaga o que ficou no navegador.
   if (anterior?.estatistica && !atual.estatistica) {
@@ -123,7 +135,9 @@ function aplicarConsentimento(atual, anterior) {
   }
   if (anterior?.marketing && !atual.marketing) {
     if (window.fbq) window.fbq('consent', 'revoke');
-    apagarCookies(['_fbp', '_fbc']);
+    apagarCookies(['_fbp', '_fbc', '__trf', 'rdtrk', '_rdtrk']);
+    // O script do RD não tem "desligar": recarrega a página para ele parar de rodar.
+    if (rdCarregado) { window.location.reload(); return; }
   }
 }
 

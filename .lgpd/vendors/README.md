@@ -6,3 +6,4 @@
 | Google Analytics (se ativado) | estatística | Operador | cookies, eventos | Termos de processamento do GA ⚠ ativar "compartilhamento de dados" mínimo |
 | Meta — WhatsApp | conversas | Controlador independente (app WhatsApp Business) | número, mensagens | Termos do WhatsApp Business |
 | Meta — Pixel (se ativado) | remarketing | Controlador conjunto (eventos) | cookies, eventos | Termos de Ferramentas de Negócios da Meta |
+| RD Station Marketing (Resultados Digitais / TOTVS) | monitoramento de visitas e automação de marketing | Operador | cookies `__trf.src`/`rdtrk`, páginas visitadas, ligação com o lead | Termos e DPA do RD Station ⚠ confirmar aceite; só carrega com consentimento de marketing |

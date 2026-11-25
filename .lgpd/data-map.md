@@ -12,6 +12,7 @@
 | A8 | Navegação e registros de acesso | Firebase Hosting | Visitantes | IP, user-agent, data/hora | Logs do Google (Hosting) | Google |
 | A9 | Estatística (opcional) | `privacidade/consent.js` | Visitantes que aceitarem | cookies `_ga`, eventos de página e conversão | Google Analytics | Google |
 | A10 | Marketing/remarketing (opcional) | `privacidade/consent.js` | Visitantes que aceitarem | cookies `_fbp`/`_fbc`, eventos | Meta | Meta |
+| A11 | Monitoramento de visitas para o comercial (opcional) | `privacidade/consent.js` (RD Station) | Visitantes que aceitarem marketing | cookies `__trf.src`/`rdtrk`, páginas visitadas, origem (UTM) | RD Station | RD Station (AWS, possivelmente EUA) |
 
 ## Armazenamento local do navegador
 | Chave | Tipo | Finalidade | Consentimento? |
